@@ -27,7 +27,8 @@ public class FamiliaController {
     }
     
     /**
-     * Registra una familia completa con el jefe de familia y tipo de ayuda
+     * Registra una familia completa con el jefe de familia
+     * Este método ahora también crea el miembro principal (jefe de familia)
      */
     public Familia registrarFamiliaCompleta(
             // Datos de la familia

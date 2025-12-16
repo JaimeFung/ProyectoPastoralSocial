@@ -61,7 +61,7 @@ public class MiembroFamilia implements Serializable {
     private Date fechaRegistro;
     
     public enum Parentesco {
-        JEFE, CONYUGE, HIJO, HIJA, PADRE, MADRE, HERMANO, HERMANA, OTRO
+        JEFE, CONYUGE, HIJO, HIJA, PADRE, MADRE, HERMANO, HERMANA, ABUELO, SOBRINO, NIETO, TIO, OTRO
     }
     
     public enum Genero {

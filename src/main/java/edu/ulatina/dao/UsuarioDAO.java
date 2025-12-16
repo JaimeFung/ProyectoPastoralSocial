@@ -4,6 +4,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
 import edu.ulatina.model.Usuario;
 
 public class UsuarioDAO extends GenericDAO<Usuario, Integer> {
@@ -32,6 +35,83 @@ public class UsuarioDAO extends GenericDAO<Usuario, Integer> {
             em.close();
         }
     }
+    
+    public static void enviarRecuperacion(String destino, String token) {
+
+        final String from = "jaimefungdel@gmail.com";
+        final String password = "mzkumurxhepulcxm";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props,
+            new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(from, password);
+                }
+            });
+        
+        
+
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(
+                    Message.RecipientType.TO,
+                    InternetAddress.parse(destino)
+            );
+
+            message.setSubject("Recuperación de contraseña");
+
+            String link = "http://localhost:8081/Pastoral_Social/reset.jsp?token=" + token;
+
+            message.setText(
+                "Para restablecer su contraseña, haga clic en el siguiente enlace:\n\n" + link
+            );
+
+            Transport.send(message);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public Usuario findByEmail(String email) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery(
+                    "SELECT u FROM Usuario u WHERE u.email = :email",
+                    Usuario.class
+            )
+            .setParameter("email", email)
+            .getSingleResult();
+
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+    
+    public Usuario findByResetToken(String token) {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<Usuario> q = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.resetToken = :token",
+                Usuario.class
+            );
+            q.setParameter("token", token);
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+
     
     // Validar credenciales de login
     public Usuario login(String usuarioOEmail, String contrasena) {

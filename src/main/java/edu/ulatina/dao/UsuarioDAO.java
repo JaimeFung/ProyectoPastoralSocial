@@ -34,27 +34,36 @@ public class UsuarioDAO extends GenericDAO<Usuario, Integer> {
     }
     
     // Validar credenciales de login
-    public Usuario login(String nombreUsuario, String contrasena) {
+    public Usuario login(String usuarioOEmail, String contrasena) {
         EntityManager em = getEntityManager();
         try {
-            String jpql = "SELECT u FROM Usuario u WHERE u.nombreUsuario = :username " +
-                         "AND u.contrasena = :password AND u.activo = true";
+            String jpql =
+                "SELECT u FROM Usuario u " +
+                "WHERE (u.nombreUsuario = :valor OR u.email = :valor) " +
+                "AND u.contrasena = :password " +
+                "AND u.activo = true";
+
             TypedQuery<Usuario> query = em.createQuery(jpql, Usuario.class);
-            query.setParameter("username", nombreUsuario);
+            query.setParameter("valor", usuarioOEmail);
             query.setParameter("password", contrasena);
+
             Usuario usuario = query.getSingleResult();
             System.out.println("✓ Login exitoso: " + usuario.getNombreCompleto());
             return usuario;
+
         } catch (NoResultException e) {
-            System.out.println("✗ Credenciales inválidas para: " + nombreUsuario);
+            System.out.println("✗ Credenciales inválidas para: " + usuarioOEmail);
             return null;
+
         } catch (Exception e) {
             System.err.println("✗ Error en login: " + e.getMessage());
             throw new RuntimeException("Error en login", e);
+
         } finally {
             em.close();
         }
     }
+
     
     // Listar usuarios por rol
     public java.util.List<Usuario> findByRol(Usuario.Rol rol) {

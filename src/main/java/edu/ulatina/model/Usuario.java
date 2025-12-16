@@ -31,7 +31,7 @@ public class Usuario implements Serializable {
     private String email;
     
     @Column(name = "activo", nullable = false)
-    private Boolean activo = true;
+    private Boolean activo = false;
     
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_creacion", updatable = false)

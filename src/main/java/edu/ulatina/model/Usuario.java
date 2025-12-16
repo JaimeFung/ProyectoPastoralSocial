@@ -51,6 +51,11 @@ public class Usuario implements Serializable {
 	public enum Rol {
 		ADMIN, COORDINADOR
 	}
+	@Column(length = 100)
+	private String resetToken;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date resetTokenExpira;
 
 	@PrePersist
 	protected void onCreate() {
@@ -160,6 +165,24 @@ public class Usuario implements Serializable {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+	
+	
+
+	public String getResetToken() {
+		return resetToken;
+	}
+
+	public void setResetToken(String resetToken) {
+		this.resetToken = resetToken;
+	}
+
+	public Date getResetTokenExpira() {
+		return resetTokenExpira;
+	}
+
+	public void setResetTokenExpira(Date resetTokenExpira) {
+		this.resetTokenExpira = resetTokenExpira;
 	}
 
 	@Override

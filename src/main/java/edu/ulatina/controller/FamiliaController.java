@@ -13,35 +13,116 @@ public class FamiliaController {
     private FamiliaDAO familiaDAO;
     private ParroquiaDAO parroquiaDAO;
     private ExpedienteDAO expedienteDAO;
+    private MiembroFamiliaController miembroController;
     
     public FamiliaController() {
         this.familiaDAO = new FamiliaDAO();
         this.parroquiaDAO = new ParroquiaDAO();
         this.expedienteDAO = new ExpedienteDAO();
+        this.miembroController = new MiembroFamiliaController();
     }
     
-    public Familia registrarFamilia(Integer idParroquia, String numeroExpediente, 
-                                    String nombreJefe, String identificacion, String direccion,
-                                    String telefono, Familia.SituacionEconomica situacion,
-                                    String observaciones, String motivoExpediente) {
+    /**
+     * Registra una familia completa con el jefe de familia
+     * Este método ahora también crea el miembro principal (jefe de familia)
+     */
+    public Familia registrarFamiliaCompleta(
+            // Datos de la familia
+            Integer idParroquia, 
+            String numeroExpediente,
+            String direccion,
+            String telefono,
+            Familia.SituacionEconomica situacion,
+            String observaciones,
+            String motivoExpediente,
+            // Datos del jefe de familia (información personal)
+            String nombre,
+            String primerApellido,
+            String segundoApellido,
+            String identificacion,
+            String fechaNacimiento,
+            String genero,
+            String estadoCivil,
+            String email) {
+        
         try {
-            // Buscar la parroquia
+            // 1. Buscar la parroquia
             Parroquia parroquia = parroquiaDAO.findById(idParroquia);
             if (parroquia == null) {
                 System.err.println("Parroquia no encontrada");
                 return null;
             }
             
-            // Crear familia
+            // 2. Crear el nombre completo del jefe para la familia
+            String nombreCompletoJefe = nombre + " " + primerApellido + " " + segundoApellido;
+            
+            // 3. Crear la familia
+            Familia familia = new Familia(parroquia, numeroExpediente, nombreCompletoJefe, 
+                                         identificacion, direccion, situacion);
+            familia.setTelefono(telefono);
+            familia.setObservaciones(observaciones);
+            
+            // 4. Guardar familia
+            familia = familiaDAO.create(familia);
+            
+            if (familia == null) {
+                System.err.println("Error al crear la familia");
+                return null;
+            }
+            
+            System.out.println("✓ Familia creada: " + familia.getNumeroExpediente());
+            
+            // 5. Crear el registro del jefe de familia en MiembroFamilia
+            miembroController.registrarJefeFamilia(
+                familia.getIdFamilia(),
+                nombre,
+                primerApellido,
+                segundoApellido,
+                identificacion,
+                fechaNacimiento,
+                genero,
+                estadoCivil,
+                telefono,
+                email
+            );
+            
+            // 6. Crear expediente automáticamente
+            if (motivoExpediente != null && !motivoExpediente.trim().isEmpty()) {
+                Expediente expediente = new Expediente(familia, motivoExpediente);
+                expedienteDAO.create(expediente);
+                System.out.println("✓ Expediente creado para familia: " + familia.getNumeroExpediente());
+            }
+            
+            return familia;
+            
+        } catch (Exception e) {
+            System.err.println("Error al registrar familia completa: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * Método original mantenido para compatibilidad
+     */
+    public Familia registrarFamilia(Integer idParroquia, String numeroExpediente, 
+                                    String nombreJefe, String identificacion, String direccion,
+                                    String telefono, Familia.SituacionEconomica situacion,
+                                    String observaciones, String motivoExpediente) {
+        try {
+            Parroquia parroquia = parroquiaDAO.findById(idParroquia);
+            if (parroquia == null) {
+                System.err.println("Parroquia no encontrada");
+                return null;
+            }
+            
             Familia familia = new Familia(parroquia, numeroExpediente, nombreJefe, 
                                          identificacion, direccion, situacion);
             familia.setTelefono(telefono);
             familia.setObservaciones(observaciones);
             
-            // Guardar familia
             familia = familiaDAO.create(familia);
             
-            // Crear expediente automáticamente
             if (familia != null && motivoExpediente != null) {
                 Expediente expediente = new Expediente(familia, motivoExpediente);
                 expedienteDAO.create(expediente);

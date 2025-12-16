@@ -7,22 +7,22 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import edu.ulatina.model.TipoAyuda;
+import edu.ulatina.model.MiembroFamilia;
 
-public class TipoAyudaDAO {
+public class MiembroFamiliaDAO {
     private EntityManagerFactory emf;
     
-    public TipoAyudaDAO() {
+    public MiembroFamiliaDAO() {
         this.emf = Persistence.createEntityManagerFactory("PastoralSocialPU");
     }
     
-    public TipoAyuda create(TipoAyuda tipoAyuda) {
+    public MiembroFamilia create(MiembroFamilia miembro) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            em.persist(tipoAyuda);
+            em.persist(miembro);
             em.getTransaction().commit();
-            return tipoAyuda;
+            return miembro;
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
@@ -34,56 +34,59 @@ public class TipoAyudaDAO {
         }
     }
     
-    public TipoAyuda findById(Integer id) {
+    public MiembroFamilia findById(Integer id) {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.find(TipoAyuda.class, id);
+            return em.find(MiembroFamilia.class, id);
         } finally {
             em.close();
         }
     }
     
-    public List<TipoAyuda> findAll() {
+    public List<MiembroFamilia> findAll() {
         EntityManager em = emf.createEntityManager();
         try {
-            TypedQuery<TipoAyuda> query = em.createQuery(
-                "SELECT t FROM TipoAyuda t", TipoAyuda.class);
+            TypedQuery<MiembroFamilia> query = em.createQuery(
+                "SELECT m FROM MiembroFamilia m", MiembroFamilia.class);
             return query.getResultList();
         } finally {
             em.close();
         }
     }
     
-    public List<TipoAyuda> findActivos() {
+    public List<MiembroFamilia> findByFamilia(Integer idFamilia) {
         EntityManager em = emf.createEntityManager();
         try {
-            TypedQuery<TipoAyuda> query = em.createQuery(
-                "SELECT t FROM TipoAyuda t WHERE t.activo = true", 
-                TipoAyuda.class);
+            TypedQuery<MiembroFamilia> query = em.createQuery(
+                "SELECT m FROM MiembroFamilia m WHERE m.familia.idFamilia = :idFamilia",
+                MiembroFamilia.class);
+            query.setParameter("idFamilia", idFamilia);
             return query.getResultList();
         } finally {
             em.close();
         }
     }
     
-    public List<TipoAyuda> findByCategoria(TipoAyuda.Categoria categoria) {
+    public MiembroFamilia findJefeFamilia(Integer idFamilia) {
         EntityManager em = emf.createEntityManager();
         try {
-            TypedQuery<TipoAyuda> query = em.createQuery(
-                "SELECT t FROM TipoAyuda t WHERE t.categoria = :categoria AND t.activo = true",
-                TipoAyuda.class);
-            query.setParameter("categoria", categoria);
-            return query.getResultList();
+            TypedQuery<MiembroFamilia> query = em.createQuery(
+                "SELECT m FROM MiembroFamilia m WHERE m.familia.idFamilia = :idFamilia " +
+                "AND m.parentesco = 'JEFE'",
+                MiembroFamilia.class);
+            query.setParameter("idFamilia", idFamilia);
+            List<MiembroFamilia> results = query.getResultList();
+            return results.isEmpty() ? null : results.get(0);
         } finally {
             em.close();
         }
     }
     
-    public TipoAyuda update(TipoAyuda tipoAyuda) {
+    public MiembroFamilia update(MiembroFamilia miembro) {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            TipoAyuda updated = em.merge(tipoAyuda);
+            MiembroFamilia updated = em.merge(miembro);
             em.getTransaction().commit();
             return updated;
         } catch (Exception e) {
@@ -101,9 +104,9 @@ public class TipoAyudaDAO {
         EntityManager em = emf.createEntityManager();
         try {
             em.getTransaction().begin();
-            TipoAyuda tipoAyuda = em.find(TipoAyuda.class, id);
-            if (tipoAyuda != null) {
-                em.remove(tipoAyuda);
+            MiembroFamilia miembro = em.find(MiembroFamilia.class, id);
+            if (miembro != null) {
+                em.remove(miembro);
             }
             em.getTransaction().commit();
         } catch (Exception e) {
@@ -111,6 +114,19 @@ public class TipoAyudaDAO {
                 em.getTransaction().rollback();
             }
             e.printStackTrace();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public long countByFamilia(Integer idFamilia) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(m) FROM MiembroFamilia m WHERE m.familia.idFamilia = :idFamilia",
+                Long.class);
+            query.setParameter("idFamilia", idFamilia);
+            return query.getSingleResult();
         } finally {
             em.close();
         }

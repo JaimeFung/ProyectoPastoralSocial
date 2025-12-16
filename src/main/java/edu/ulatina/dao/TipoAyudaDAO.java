@@ -1,111 +1,116 @@
 package edu.ulatina.dao;
 
-import edu.ulatina.model.TipoAyuda;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
-public class TipoAyudaDAO extends GenericDAO<TipoAyuda, Integer> {
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
+
+import edu.ulatina.model.TipoAyuda;
+
+public class TipoAyudaDAO {
+    private EntityManagerFactory emf;
     
     public TipoAyudaDAO() {
-        super(TipoAyuda.class);
+        this.emf = Persistence.createEntityManagerFactory("PastoralSocialPU");
     }
     
-    /**
-     * Lista todos los tipos de ayuda activos
-     */
-    public List<TipoAyuda> findActivos() {
-        EntityManager em = getEntityManager();
+    public TipoAyuda create(TipoAyuda tipoAyuda) {
+        EntityManager em = emf.createEntityManager();
         try {
-            String jpql = "SELECT t FROM TipoAyuda t WHERE t.activo = true ORDER BY t.categoria, t.nombre";
-            TypedQuery<TipoAyuda> query = em.createQuery(jpql, TipoAyuda.class);
-            List<TipoAyuda> results = query.getResultList();
-            System.out.println("✓ Se encontraron " + results.size() + " tipos de ayuda activos");
-            return results;
+            em.getTransaction().begin();
+            em.persist(tipoAyuda);
+            em.getTransaction().commit();
+            return tipoAyuda;
         } catch (Exception e) {
-            System.err.println("✗ Error al buscar tipos de ayuda activos: " + e.getMessage());
-            throw new RuntimeException("Error al buscar tipos de ayuda activos", e);
-        } finally {
-            em.close();
-        }
-    }
-    
-    /**
-     * Busca tipos de ayuda por categoría
-     */
-    public List<TipoAyuda> findByCategoria(TipoAyuda.Categoria categoria) {
-        EntityManager em = getEntityManager();
-        try {
-            String jpql = "SELECT t FROM TipoAyuda t WHERE t.categoria = :categoria AND t.activo = true ORDER BY t.nombre";
-            TypedQuery<TipoAyuda> query = em.createQuery(jpql, TipoAyuda.class);
-            query.setParameter("categoria", categoria);
-            List<TipoAyuda> results = query.getResultList();
-            System.out.println("✓ Se encontraron " + results.size() + " tipos de ayuda en categoría " + categoria);
-            return results;
-        } catch (Exception e) {
-            System.err.println("✗ Error al buscar tipos de ayuda por categoría: " + e.getMessage());
-            throw new RuntimeException("Error al buscar tipos de ayuda por categoría", e);
-        } finally {
-            em.close();
-        }
-    }
-    
-    /**
-     * Busca un tipo de ayuda por nombre exacto
-     */
-    public TipoAyuda findByNombre(String nombre) {
-        EntityManager em = getEntityManager();
-        try {
-            String jpql = "SELECT t FROM TipoAyuda t WHERE t.nombre = :nombre";
-            TypedQuery<TipoAyuda> query = em.createQuery(jpql, TipoAyuda.class);
-            query.setParameter("nombre", nombre);
-            List<TipoAyuda> results = query.getResultList();
-            if (!results.isEmpty()) {
-                System.out.println("✓ Tipo de ayuda encontrado: " + results.get(0).getNombre());
-                return results.get(0);
-            } else {
-                System.out.println("⚠ No se encontró tipo de ayuda con nombre: " + nombre);
-                return null;
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
             }
-        } catch (Exception e) {
-            System.err.println("✗ Error al buscar tipo de ayuda por nombre: " + e.getMessage());
-            throw new RuntimeException("Error al buscar tipo de ayuda por nombre", e);
+            e.printStackTrace();
+            return null;
         } finally {
             em.close();
         }
     }
     
-    /**
-     * Busca tipos de ayuda por nombre (búsqueda parcial)
-     */
-    public List<TipoAyuda> findByNombreLike(String nombre) {
-        EntityManager em = getEntityManager();
+    public TipoAyuda findById(Integer id) {
+        EntityManager em = emf.createEntityManager();
         try {
-            String jpql = "SELECT t FROM TipoAyuda t WHERE t.nombre LIKE :nombre AND t.activo = true ORDER BY t.nombre";
-            TypedQuery<TipoAyuda> query = em.createQuery(jpql, TipoAyuda.class);
-            query.setParameter("nombre", "%" + nombre + "%");
+            return em.find(TipoAyuda.class, id);
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<TipoAyuda> findAll() {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<TipoAyuda> query = em.createQuery(
+                "SELECT t FROM TipoAyuda t", TipoAyuda.class);
             return query.getResultList();
-        } catch (Exception e) {
-            System.err.println("✗ Error al buscar tipos de ayuda por nombre: " + e.getMessage());
-            throw new RuntimeException("Error al buscar tipos de ayuda por nombre", e);
         } finally {
             em.close();
         }
     }
     
-    /**
-     * Cuenta cuántos tipos de ayuda hay por categoría
-     */
-    public long countByCategoria(TipoAyuda.Categoria categoria) {
-        EntityManager em = getEntityManager();
+    public List<TipoAyuda> findActivos() {
+        EntityManager em = emf.createEntityManager();
         try {
-            String jpql = "SELECT COUNT(t) FROM TipoAyuda t WHERE t.categoria = :categoria AND t.activo = true";
-            TypedQuery<Long> query = em.createQuery(jpql, Long.class);
+            TypedQuery<TipoAyuda> query = em.createQuery(
+                "SELECT t FROM TipoAyuda t WHERE t.activo = true", 
+                TipoAyuda.class);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public List<TipoAyuda> findByCategoria(TipoAyuda.Categoria categoria) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            TypedQuery<TipoAyuda> query = em.createQuery(
+                "SELECT t FROM TipoAyuda t WHERE t.categoria = :categoria AND t.activo = true",
+                TipoAyuda.class);
             query.setParameter("categoria", categoria);
-            return query.getSingleResult();
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+    
+    public TipoAyuda update(TipoAyuda tipoAyuda) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            TipoAyuda updated = em.merge(tipoAyuda);
+            em.getTransaction().commit();
+            return updated;
         } catch (Exception e) {
-            System.err.println("✗ Error al contar tipos de ayuda: " + e.getMessage());
-            return 0;
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+    
+    public void delete(Integer id) {
+        EntityManager em = emf.createEntityManager();
+        try {
+            em.getTransaction().begin();
+            TipoAyuda tipoAyuda = em.find(TipoAyuda.class, id);
+            if (tipoAyuda != null) {
+                em.remove(tipoAyuda);
+            }
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
         } finally {
             em.close();
         }

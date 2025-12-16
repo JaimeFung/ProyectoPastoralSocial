@@ -8,18 +8,26 @@ import java.util.List;
 
 /**
  * Entity implementation class for Entity: Familia
- *
+ * Actualizado con relación a TipoAyuda
  */
 @Entity
-
+@Table(name = "familia")
 public class Familia implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    
+    public enum TipoVivienda {
+        PROPIA,
+        ALQUILADA,
+        PRESTADA,
+        PRECARIO
+    }
 
-	@Id
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_vivienda", nullable = false)
+    private TipoVivienda tipoVivienda;
+    
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_familia")
     private Integer idFamilia;
@@ -27,6 +35,10 @@ public class Familia implements Serializable {
     @ManyToOne
     @JoinColumn(name = "id_parroquia", nullable = false)
     private Parroquia parroquia;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_ayuda")
+    private TipoAyuda tipoAyuda;
     
     @Column(name = "numero_expediente", unique = true, nullable = false, length = 50)
     private String numeroExpediente;
@@ -44,7 +56,7 @@ public class Familia implements Serializable {
     private String telefono;
     
     @Column(name = "cantidad_miembros")
-    private Integer cantidadMiembros = 0;
+    private Integer cantidadMiembros;
     
     @Enumerated(EnumType.STRING)
     @Column(name = "situacion_economica", nullable = false)
@@ -105,6 +117,9 @@ public class Familia implements Serializable {
     public Parroquia getParroquia() { return parroquia; }
     public void setParroquia(Parroquia parroquia) { this.parroquia = parroquia; }
     
+    public TipoAyuda getTipoAyuda() { return tipoAyuda; }
+    public void setTipoAyuda(TipoAyuda tipoAyuda) { this.tipoAyuda = tipoAyuda; }
+    
     public String getNumeroExpediente() { return numeroExpediente; }
     public void setNumeroExpediente(String numeroExpediente) { this.numeroExpediente = numeroExpediente; }
     
@@ -141,6 +156,9 @@ public class Familia implements Serializable {
     public Expediente getExpediente() { return expediente; }
     public void setExpediente(Expediente expediente) { this.expediente = expediente; }
     
+    public TipoVivienda getTipoVivienda() {return tipoVivienda;}
+    public void setTipoVivienda(TipoVivienda tipoVivienda) {this.tipoVivienda = tipoVivienda;}
+    
     @Override
     public String toString() {
         return "Familia{" +
@@ -149,10 +167,10 @@ public class Familia implements Serializable {
                 ", nombreJefeFamilia='" + nombreJefeFamilia + '\'' +
                 ", identificacionJefe='" + identificacionJefe + '\'' +
                 ", parroquia=" + (parroquia != null ? parroquia.getNombre() : "N/A") +
+                ", tipoAyuda=" + (tipoAyuda != null ? tipoAyuda.getNombre() : "N/A") +
                 ", cantidadMiembros=" + cantidadMiembros +
                 ", situacionEconomica=" + situacionEconomica +
                 ", activa=" + activa +
                 '}';
     }
-   
 }

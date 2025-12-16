@@ -22,8 +22,7 @@ public class MiembroFamiliaController {
     /**
      * Registra un nuevo miembro de familia
      */
-    public MiembroFamilia registrarMiembro(Integer idFamilia, String nombre, 
-                                           String primerApellido, String segundoApellido,
+    public MiembroFamilia registrarMiembro(Integer idFamilia, String nombreCompleto,
                                            String identificacion, String fechaNacimientoStr,
                                            String generoStr, String estadoCivil,
                                            String telefono, String email,
@@ -47,9 +46,8 @@ public class MiembroFamiliaController {
             MiembroFamilia.Parentesco parentesco = MiembroFamilia.Parentesco.valueOf(parentescoStr.toUpperCase());
             
             // Crear miembro
-            MiembroFamilia miembro = new MiembroFamilia(familia, nombre, primerApellido, 
-                                                        segundoApellido, fechaNacimiento, 
-                                                        parentesco, genero);
+            MiembroFamilia miembro = new MiembroFamilia(familia, nombreCompleto, 
+                                                        fechaNacimiento, parentesco, genero);
             miembro.setIdentificacion(identificacion);
             miembro.setEstadoCivil(estadoCivil);
             miembro.setTelefono(telefono);
@@ -79,13 +77,12 @@ public class MiembroFamiliaController {
     /**
      * Registra al jefe de familia (miembro principal)
      */
-    public MiembroFamilia registrarJefeFamilia(Integer idFamilia, String nombre, 
-                                               String primerApellido, String segundoApellido,
+    public MiembroFamilia registrarJefeFamilia(Integer idFamilia, String nombreCompleto,
                                                String identificacion, String fechaNacimientoStr,
                                                String generoStr, String estadoCivil,
                                                String telefono, String email) {
-        return registrarMiembro(idFamilia, nombre, primerApellido, segundoApellido,
-                               identificacion, fechaNacimientoStr, generoStr, estadoCivil,
+        return registrarMiembro(idFamilia, nombreCompleto, identificacion, 
+                               fechaNacimientoStr, generoStr, estadoCivil,
                                telefono, email, "JEFE");
     }
     

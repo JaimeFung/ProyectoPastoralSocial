@@ -168,30 +168,77 @@ public class TestPastoralSocial {
     
     private static void registrarUsuario() {
         System.out.println("\n--- REGISTRAR NUEVO USUARIO ---");
+
         System.out.print("Nombre de usuario: ");
         String username = scanner.nextLine();
+
         System.out.print("Contraseña: ");
         String password = scanner.nextLine();
+
         System.out.print("Nombre completo: ");
         String nombreCompleto = scanner.nextLine();
+
         System.out.print("Email: ");
         String email = scanner.nextLine();
-        System.out.println("Roles: 1.ADMIN 2.COORDINADOR 3.VOLUNTARIO");
+
+        System.out.print("Teléfono: ");
+        String telefono = scanner.nextLine();
+
+        System.out.println("\nRoles:");
+        System.out.println("1. ADMIN");
+        System.out.println("2. COORDINADOR");
+        System.out.println("3. VOLUNTARIO");
         System.out.print("Seleccione rol: ");
-        int rol = leerOpcion();
-        
-        Usuario.Rol rolSeleccionado = Usuario.Rol.VOLUNTARIO;
-        switch (rol) {
-            case 1: rolSeleccionado = Usuario.Rol.ADMIN; break;
-            case 2: rolSeleccionado = Usuario.Rol.COORDINADOR; break;
-            case 3: rolSeleccionado = Usuario.Rol.VOLUNTARIO; break;
+        int rolInput = leerOpcion();
+
+        Usuario.Rol rolSeleccionado = Usuario.Rol.ADMIN;;
+        switch (rolInput) {
+            case 1:
+                rolSeleccionado = Usuario.Rol.ADMIN;
+                break;
+            case 2:
+                rolSeleccionado = Usuario.Rol.COORDINADOR;
+                break;
+            case 3:
+                
+            default:
+                System.out.println("Rol inválido. Se asigna VOLUNTARIO por defecto.");
+                
         }
-        
-        Usuario usuario = usuarioController.registrarUsuario(username, password, nombreCompleto, rolSeleccionado, email);
-        if (usuario != null) {
-            System.out.println("\n✓ Usuario registrado exitosamente");
+
+        // Mostrar parroquias (hardcodeadas por ahora)
+        System.out.println("\nParroquias disponibles:");
+        System.out.println("1. Parroquia Santiago Apóstol");
+        System.out.println("2. Parroquia San Nicolás");
+        System.out.println("3. Parroquia Inmaculada Concepción");
+        System.out.println("4. Parroquia Nuestra Señora del Pilar");
+        System.out.print("Seleccione parroquia: ");
+        int idParroquia = leerOpcion();
+
+        try {
+            UsuarioController controller = new UsuarioController();
+
+            Usuario usuario = controller.registrarUsuario(
+                    username,
+                    password,
+                    nombreCompleto,
+                    rolSeleccionado,
+                    email,
+                    idParroquia,
+                    telefono
+            );
+
+            if (usuario != null) {
+                System.out.println("✔ Usuario registrado correctamente");
+            } else {
+                System.out.println("✘ No se pudo registrar el usuario");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error al registrar usuario: " + e.getMessage());
         }
     }
+
     
     private static void listarUsuarios() {
         System.out.println("\n--- LISTA DE USUARIOS ---");

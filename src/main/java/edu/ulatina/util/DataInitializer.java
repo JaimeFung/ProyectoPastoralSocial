@@ -41,36 +41,7 @@ public class DataInitializer {
      * Crea usuarios por defecto del sistema
      */
     private void crearUsuariosIniciales() {
-        System.out.println("→ Creando usuarios iniciales...");
         
-        // Usuario administrador
-        usuarioController.registrarUsuario(
-            "admin",
-            "admin123",
-            "Administrador Sistema",
-            Usuario.Rol.ADMIN,
-            "admin@diocesiscartago.org"
-        );
-        
-        // Usuario coordinador
-        usuarioController.registrarUsuario(
-            "coordinador1",
-            "coord123",
-            "María Rodríguez",
-            Usuario.Rol.COORDINADOR,
-            "maria@diocesiscartago.org"
-        );
-        
-        // Usuario voluntario
-        usuarioController.registrarUsuario(
-            "voluntario1",
-            "vol123",
-            "Carlos Jiménez",
-            Usuario.Rol.VOLUNTARIO,
-            "carlos@diocesiscartago.org"
-        );
-        
-        System.out.println("  ✓ 3 usuarios creados");
     }
     
     /**

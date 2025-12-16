@@ -6,14 +6,15 @@ import java.util.Date;
 import javax.persistence.*;
 
 /**
- * Entity implementation class for Entity: MiembroFamilia
- * Simplificado - Solo nombreCompleto
+ * Entity implementation class for Entity: Miembro
+ *
  */
 @Entity
 @Table(name = "miembrofamilia")
 public class MiembroFamilia implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	
+private static final long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +24,15 @@ public class MiembroFamilia implements Serializable {
     @ManyToOne
     @JoinColumn(name = "id_familia", nullable = false)
     private Familia familia;
+    
+    @Column(name = "nombre", nullable = false, length = 50)
+    private String nombre;
+    
+    @Column(name = "primer_apellido", nullable = false, length = 50)
+    private String primerApellido;
+    
+    @Column(name = "segundo_apellido", nullable = false, length = 50)
+    private String segundoApellido;
     
     @Column(name = "nombre_completo", nullable = false, length = 150)
     private String nombreCompleto;
@@ -72,11 +82,13 @@ public class MiembroFamilia implements Serializable {
     protected void onCreate() {
         fechaRegistro = new Date();
         calcularEdad();
+        generarNombreCompleto();
     }
     
     @PreUpdate
     protected void onUpdate() {
         calcularEdad();
+        generarNombreCompleto();
     }
     
     private void calcularEdad() {
@@ -87,13 +99,22 @@ public class MiembroFamilia implements Serializable {
         }
     }
     
+    private void generarNombreCompleto() {
+        if (nombre != null && primerApellido != null && segundoApellido != null) {
+            this.nombreCompleto = nombre + " " + primerApellido + " " + segundoApellido;
+        }
+    }
+    
     // Constructores
     public MiembroFamilia() {}
     
-    public MiembroFamilia(Familia familia, String nombreCompleto, Date fechaNacimiento, 
+    public MiembroFamilia(Familia familia, String nombre, String primerApellido, 
+                          String segundoApellido, Date fechaNacimiento, 
                           Parentesco parentesco, Genero genero) {
         this.familia = familia;
-        this.nombreCompleto = nombreCompleto;
+        this.nombre = nombre;
+        this.primerApellido = primerApellido;
+        this.segundoApellido = segundoApellido;
         this.fechaNacimiento = fechaNacimiento;
         this.parentesco = parentesco;
         this.genero = genero;
@@ -105,6 +126,24 @@ public class MiembroFamilia implements Serializable {
     
     public Familia getFamilia() { return familia; }
     public void setFamilia(Familia familia) { this.familia = familia; }
+    
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { 
+        this.nombre = nombre;
+        generarNombreCompleto();
+    }
+    
+    public String getPrimerApellido() { return primerApellido; }
+    public void setPrimerApellido(String primerApellido) { 
+        this.primerApellido = primerApellido;
+        generarNombreCompleto();
+    }
+    
+    public String getSegundoApellido() { return segundoApellido; }
+    public void setSegundoApellido(String segundoApellido) { 
+        this.segundoApellido = segundoApellido;
+        generarNombreCompleto();
+    }
     
     public String getNombreCompleto() { return nombreCompleto; }
     public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
@@ -154,4 +193,5 @@ public class MiembroFamilia implements Serializable {
                 ", estadoCivil='" + estadoCivil + '\'' +
                 '}';
     }
+   
 }

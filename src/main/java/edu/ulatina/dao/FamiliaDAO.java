@@ -30,7 +30,17 @@ public class FamiliaDAO extends GenericDAO<Familia, Integer> {
             em.close();
         }
     }
-    
+    public long countActivas() {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(f) FROM Familia f WHERE f.activa = true", 
+                Long.class);
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
     
     public List<Familia> findByParroquia(Integer idParroquia) {
         EntityManager em = getEntityManager();

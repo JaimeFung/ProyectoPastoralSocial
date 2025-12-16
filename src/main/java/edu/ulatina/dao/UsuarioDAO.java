@@ -6,6 +6,8 @@ import javax.persistence.TypedQuery;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import java.util.List;
 import java.util.Properties;
 import edu.ulatina.model.Usuario;
 
@@ -76,6 +78,18 @@ public class UsuarioDAO extends GenericDAO<Usuario, Integer> {
 
         } catch (MessagingException e) {
             throw new RuntimeException(e);
+        }
+    }
+    
+    public List<Usuario> findActivos() {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<Usuario> query = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.activo = true ORDER BY u.nombreCompleto", 
+                Usuario.class);
+            return query.getResultList();
+        } finally {
+            em.close();
         }
     }
     public Usuario findByEmail(String email) {

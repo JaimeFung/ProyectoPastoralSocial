@@ -45,4 +45,16 @@ public class ExpedienteDAO extends GenericDAO<Expediente, Integer> {
             em.close();
         }
     }
+    public long countActivos() {
+        EntityManager em = getEntityManager();
+        try {
+            TypedQuery<Long> query = em.createQuery(
+                "SELECT COUNT(e) FROM Expediente e WHERE e.estado = :estado", 
+                Long.class);
+            query.setParameter("estado", Expediente.Estado.ACTIVO);
+            return query.getSingleResult();
+        } finally {
+            em.close();
+        }
+    }
 }

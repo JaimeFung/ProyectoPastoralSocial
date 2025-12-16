@@ -94,15 +94,17 @@ public class FamiliaController {
             
             // 6. Crear el registro del jefe de familia en MiembroFamilia
             miembroController.registrarJefeFamilia(
-                familia.getIdFamilia(),
-                nombreCompletoJefe,
-                identificacion,
-                fechaNacimiento,
-                genero,
-                estadoCivil,
-                telefono,
-                email
-            );
+                    familia.getIdFamilia(),
+                    nombre,
+                    primerApellido,
+                    segundoApellido,
+                    identificacion,
+                    fechaNacimiento,
+                    genero,
+                    estadoCivil,
+                    telefono,
+                    email
+                );
             
             // 7. Crear expediente automáticamente
             if (motivoExpediente != null && !motivoExpediente.trim().isEmpty()) {

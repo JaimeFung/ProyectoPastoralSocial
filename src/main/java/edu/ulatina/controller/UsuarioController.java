@@ -38,6 +38,7 @@ public class UsuarioController {
 			return null;
 		}
 	}
+	
 
 	public Usuario login(String nombreUsuario, String contrasena) {
 		return usuarioDAO.login(nombreUsuario, contrasena);
@@ -76,7 +77,9 @@ public class UsuarioController {
 	    UsuarioDAO.enviarRecuperacion(usuario.getEmail(), token);
 	}
 	
-	
+	public List<Usuario> listarActivos() {
+        return usuarioDAO.findActivos();
+    }
 	
 	public boolean restablecerContrasenaPorToken(String token, String nuevaContrasena) {
 
